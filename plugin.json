@@ -1,0 +1,322 @@
+{
+    "id": "generate_powerpoint_slides",
+    "code": "async function generate_powerpoint_slides(params, userSettings) {\n  const { slides } = params;\n  const { pluginServer } = userSettings;\n\n  if (!pluginServer) {\n    throw new Error(\n      'Missing plugin server URL. Please set it in the plugin settings.'\n    );\n  }\n\n  try {\n    const headers = {\n      'Content-Type': 'application/json'\n    };\n    const response = await fetch(\n      `${pluginServer}/powerpoint-generator/generate`,\n      {\n        method: \"POST\",\n        headers: headers,\n        body: JSON.stringify({\n          slides: slides\n        }),\n      }      \n    );\n  \n    if (!response.ok) {\n      throw new Error(\n        `Failed to generate powerpoint: ${response.status} - ${response.statusText}`\n      );\n    }\n  \n    const data = await response.json();\n    if (!data?.responseObject?.downloadUrl) {\n      throw new Error(\n        `Failed to get download file url: ${response.status} - ${response.statusText}`\n      );\n    }\n    return `${pluginServer}${data?.responseObject?.downloadUrl}`;\n  } catch (error) {\n    console.error('Error generating powerpoint:', error);\n    return 'Error: Unable to generate powerpoint. Please try again later.';\n  }\n}",
+    "uuid": "9626f3af-5ef7-4234-aadf-fba896bf3177",
+    "emoji": "🧩",
+    "title": "Powerpoint Generator",
+    "system": false,
+    "iconURL": "https://cdn-dynmedia-1.microsoft.com/is/image/microsoftcorp/Icon_PowerPoint_36x36_2x?fmt=png-alpha",
+    "disabled": false,
+    "syncedAt": null,
+    "httpAction": {
+        "id": "8e520cf2-112d-4c06-9c86-026138549ac0",
+        "url": "{pluginServer}/powerpoint-generator/generate",
+        "name": "",
+        "method": "POST",
+        "hasBody": true,
+        "hasHeaders": true,
+        "requestBody": "{\n     \"slides\": {slides},\n     \"slideConfig\": {\n        \"layout\": \"{layout}\",\n        \"titleFontSize\": {titleFontSize},\n        \"headerFontSize\": {headerFontSize},\n        \"bodyFontSize\": {bodyFontSize},\n        \"fontFamily\": \"{fontFamily}\",\n        \"backgroundColor\": \"{backgroundColor}\",\n        \"textColor\": \"{textColor}\",\n        \"showFooter\": {showFooter},\n        \"showSlideNumber\": {showSlideNumber},\n        \"footerBackgroundColor\": \"{footerBackgroundColor}\",\n        \"footerText\": \"{footerText}\",\n        \"footerTextColor\": \"{footerTextColor}\",\n        \"footerFontSize\": {footerFontSize},\n        \"showTableBorder\": {showTableBorder},\n        \"tableHeaderBackgroundColor\": \"{tableHeaderBackgroundColor}\",\n        \"tableHeaderTextColor\": \"{tableHeaderTextColor}\",\n        \"tableBorderThickness\": {tableBorderThickness},\n        \"tableBorderColor\": \"{tableBorderColor}\",\n        \"tableFontSize\": {tableFontSize},\n        \"tableTextColor\": \"{tableTextColor}\"\n    }\n}",
+        "requestHeaders": "{\n      \"Content-Type\": \"application/json\"\n}",
+        "resultTransform": {
+            "engine": "jmes",
+            "expression": ""
+        },
+        "hasResultTransform": false
+    },
+    "openaiSpec": {
+        "name": "generate_powerpoint_slides",
+        "parameters": {
+            "type": "object",
+            "required": [
+                "slides"
+            ],
+            "properties": {
+                "slides": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "type",
+                            "title"
+                        ],
+                        "properties": {
+                            "type": {
+                                "enum": [
+                                    "title_slide",
+                                    "content_slide",
+                                    "table_slide",
+                                    "chart_slide"
+                                ],
+                                "type": "string",
+                                "description": "The type of slide, either 'title_slide' (title-only), 'content_slide' (title and content), 'table_slide' (title with tabular content), or 'chart_slide' (title with chart content)."
+                            },
+                            "title": {
+                                "type": "string",
+                                "description": "The title of the slide."
+                            },
+                            "content": {
+                                "type": "array",
+                                "items": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    },
+                                    "description": "A row in the table for 'table_slide'. Each row is an array of strings."
+                                },
+                                "description": "The content of the slide. For 'title_slide', this is not required. For 'content_slide', it can be a string (paragraph) or an array of strings (list). For 'table_slide', it is an array of rows, where each row is an array of strings."
+                            },
+                            "subtitle": {
+                                "type": "string",
+                                "description": "The subtitle of the slide, which provides additional information to support the title. Only title_slide has the subtitle."
+                            },
+                            "chartContent": {
+                                "type": "object",
+                                "required": [
+                                    "type",
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "description": "The name of the chart series."
+                                                },
+                                                "labels": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": "The labels for the chart (e.g., categories, time periods)."
+                                                },
+                                                "values": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "number"
+                                                    },
+                                                    "description": "The values for each label in the chart."
+                                                }
+                                            }
+                                        },
+                                        "description": "The chart data. Depending on the type, this can be an array of labels and values."
+                                    },
+                                    "type": {
+                                        "enum": [
+                                            "pie",
+                                            "bar",
+                                            "line",
+                                            "doughnut"
+                                        ],
+                                        "type": "string",
+                                        "description": "The type of chart, either 'pie', 'doughnut', 'bar', or 'line'."
+                                    }
+                                },
+                                "description": "The chart data for 'chart_slide'. This includes various types of chart data such as pie charts, doughnut charts, bar charts, and line charts."
+                            }
+                        }
+                    },
+                    "description": "A list of slides, where each slide includes its type, title, and content."
+                }
+            }
+        },
+        "description": "Generate a PowerPoint file and return the URL for downloading it."
+    },
+    "outputType": "respond_to_ai",
+    "oauthConfig": null,
+    "userSettings": [
+        {
+            "name": "pluginServer",
+            "label": "Plugin Server",
+            "required": true,
+            "description": "The URL of the plugin server. For more details, refer to the documentation: https://docs.typingmind.com/plugins/plugins-server",
+            "placeholder": "https://...."
+        },
+        {
+            "name": "layout",
+            "type": "enum",
+            "label": "Slide Layout",
+            "values": [
+                "LAYOUT_WIDE",
+                "LAYOUT_16x9",
+                "LAYOUT_16x10",
+                "LAYOUT_4x3"
+            ],
+            "description": "Default: LAYOUT_WIDE. Options: LAYOUT_16x9, LAYOUT_16x10, LAYOUT_4x3."
+        },
+        {
+            "name": "titleFontSize",
+            "type": "number",
+            "label": "Title Font Size",
+            "description": "Font size for the title slide to emphasize the main topic, default is 52 pt.",
+            "placeholder": "52"
+        },
+        {
+            "name": "headerFontSize",
+            "type": "number",
+            "label": "Header Font Size",
+            "description": "Font size for headers in content slides, default is 32 pt.",
+            "placeholder": "32"
+        },
+        {
+            "name": "bodyFontSize",
+            "type": "number",
+            "label": "Body Font Size",
+            "description": "Font size for main content text, default is 24 pt.",
+            "placeholder": "24"
+        },
+        {
+            "name": "fontFamily",
+            "type": "enum",
+            "label": "Font Family",
+            "values": [
+                "Calibri",
+                "Arial",
+                "Courier New",
+                "Georgia",
+                "Helvetica",
+                "Impact",
+                "Lucida Console",
+                "Tahoma",
+                "Times New Roman",
+                "Trebuchet MS",
+                "Verdana",
+                "Comic Sans MS",
+                "Franklin Gothic Medium",
+                "Century Gothic",
+                "Gill Sans",
+                "Garamond",
+                "Palatino Linotype",
+                "Segoe UI",
+                "Book Antiqua",
+                "Symbol",
+                "Monospace",
+                "Webdings",
+                "Wingdings"
+            ],
+            "description": "Default font family for the slide. default is Calibri",
+            "placeholder": "Calibri"
+        },
+        {
+            "name": "backgroundColor",
+            "type": "text",
+            "label": "Background Color",
+            "description": "Slide background color in hex format, default is #FFFFFF.",
+            "placeholder": "#FFFFFF"
+        },
+        {
+            "name": "textColor",
+            "type": "text",
+            "label": "Text Color",
+            "description": "Text color in hex format, default is #000000.",
+            "placeholder": "#000000"
+        },
+        {
+            "name": "showFooter",
+            "type": "enum",
+            "label": "Show Footer",
+            "values": [
+                "false",
+                "true"
+            ],
+            "description": "Toggle to display the footer, default is false."
+        },
+        {
+            "name": "showSlideNumber",
+            "type": "enum",
+            "label": "Show Slide Number",
+            "values": [
+                "false",
+                "true"
+            ],
+            "description": "Toggle to display slide numbers, default is false."
+        },
+        {
+            "name": "footerBackgroundColor",
+            "type": "text",
+            "label": "Footer Background Color",
+            "description": "Footer background color in hex format, default is #003B75.",
+            "placeholder": "#003B75 - Dark Blue"
+        },
+        {
+            "name": "footerText",
+            "type": "text",
+            "label": "Footer Text",
+            "description": "Footer text content, default is 'footer text'.",
+            "placeholder": "Ex. TypingMind Custom"
+        },
+        {
+            "name": "footerTextColor",
+            "type": "text",
+            "label": "Footer Text Color",
+            "description": "Footer text color in hex format, default is #FFFFFF.",
+            "placeholder": "#FFFFFF"
+        },
+        {
+            "name": "footerFontSize",
+            "type": "number",
+            "label": "Footer Font Size",
+            "description": "Font size for footer text, default is 10 pt.",
+            "placeholder": "10"
+        },
+        {
+            "name": "showTableBorder",
+            "type": "enum",
+            "label": "Show Table Border",
+            "values": [
+                "true",
+                "false"
+            ],
+            "description": "Toggle to display table borders, default is true."
+        },
+        {
+            "name": "tableHeaderBackgroundColor",
+            "type": "text",
+            "label": "Table Header Background Color",
+            "description": "Background color for table headers in hex format, default is #003B75.",
+            "placeholder": "#003B75 - Dark Blue"
+        },
+        {
+            "name": "tableHeaderTextColor",
+            "type": "text",
+            "label": "Table Header Text Color",
+            "description": "Text color for table headers in hex format, default is #FFFFFF.",
+            "placeholder": "#FFFFFF"
+        },
+        {
+            "name": "tableBorderThickness",
+            "type": "number",
+            "label": "Table Border Thickness",
+            "description": "Thickness of table borders in points, default is 1 pt.",
+            "placeholder": "1 pt"
+        },
+        {
+            "name": "tableBorderColor",
+            "type": "text",
+            "label": "Table Border Color",
+            "description": "Table border color in hex format, default is #000000.",
+            "placeholder": "#000000"
+        },
+        {
+            "name": "tableFontSize",
+            "type": "number",
+            "label": "Table Font Size",
+            "description": "Font size for text inside tables, default is 14 pt.",
+            "placeholder": "14 pt"
+        },
+        {
+            "name": "tableTextColor",
+            "type": "text",
+            "label": "Table Text Color",
+            "description": "Text color for table content in hex format, default is #000000.",
+            "placeholder": "#000000"
+        }
+    ],
+    "isServerPlugin": false,
+    "overviewMarkdown": "# PowerPoint Generator\n\nThis plugin enables users to generate PowerPoint slides quickly and efficiently.\n\n👉 **It supports**:  \n- Multiple **slide layouts** to fit different presentation needs.\n- **Tables** and various **charts** (pie, bar, line, doughnut).\n- Options to **show/hide footers** with customizable attributes.\n- Ability to **customize basic slide attributes**, including font family, font size, background color, etc.\n\n👉 **Note:** A plugin server must be set up to use this feature.  \n- Follow the detailed guide to set up a plugin server on Render: [How to Deploy Plugins Server on Render](https://docs.typingmind.com/plugins/plugins-server/how-to-deploy-plugins-server-on-render)  ",
+    "turnedOnByDefault": false,
+    "authenticationType": "AUTH_TYPE_NONE",
+    "implementationType": "http"
+}
