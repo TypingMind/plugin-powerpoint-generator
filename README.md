@@ -1,4 +1,4 @@
-# Powerpoint Generator
+# PowerPoint Generator
 
 This plugin enables users to generate PowerPoint slides quickly and efficiently.
 
