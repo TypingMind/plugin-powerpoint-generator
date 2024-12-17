@@ -1,6 +1,6 @@
 {
     "id": "generate_powerpoint_slides",
-    "code": "async function generate_powerpoint_slides(params, userSettings) {\n  const { slides } = params;\n  const { pluginServer } = userSettings;\n\n  if (!pluginServer) {\n    throw new Error(\n      'Missing plugin server URL. Please set it in the plugin settings.'\n    );\n  }\n\n  try {\n    const headers = {\n      'Content-Type': 'application/json'\n    };\n    const response = await fetch(\n      `${pluginServer}/powerpoint-generator/generate`,\n      {\n        method: \"POST\",\n        headers: headers,\n        body: JSON.stringify({\n          slides: slides\n        }),\n      }      \n    );\n  \n    if (!response.ok) {\n      throw new Error(\n        `Failed to generate powerpoint: ${response.status} - ${response.statusText}`\n      );\n    }\n  \n    const data = await response.json();\n    if (!data?.responseObject?.downloadUrl) {\n      throw new Error(\n        `Failed to get download file url: ${response.status} - ${response.statusText}`\n      );\n    }\n    return `${pluginServer}${data?.responseObject?.downloadUrl}`;\n  } catch (error) {\n    console.error('Error generating powerpoint:', error);\n    return 'Error: Unable to generate powerpoint. Please try again later.';\n  }\n}",
+    "code": "# Your JS code here",
     "uuid": "9626f3af-5ef7-4234-aadf-fba896bf3177",
     "emoji": "🧩",
     "title": "PowerPoint Generator",
