@@ -1,19 +1,21 @@
 {
-    "id": "generate_word_file",
-    "code": "",
-    "uuid": "b634fc80-9419-40de-8044-708268c26141",
+    "id": "generate_powerpoint_slides",
+    "code": "# Your JS code here",
+    "uuid": "9626f3af-5ef7-4234-aadf-fba896bf3177",
     "emoji": "🧩",
-    "title": "Word Generator",
-    "iconURL": "https://cdn-dynmedia-1.microsoft.com/is/content/microsoftcorp/Icon-Word-28x281?resMode=sharp2&op_usm=1.5,0.65,15,0&qlt=100",
+    "title": "PowerPoint Generator",
+    "system": false,
+    "iconURL": "https://cdn-dynmedia-1.microsoft.com/is/image/microsoftcorp/Icon_PowerPoint_36x36_2x?fmt=png-alpha",
     "disabled": false,
+    "syncedAt": null,
     "httpAction": {
         "id": "8e520cf2-112d-4c06-9c86-026138549ac0",
-        "url": "{pluginServer}/word-generator/generate",
+        "url": "{pluginServer}/powerpoint-generator/generate",
         "name": "",
         "method": "POST",
         "hasBody": true,
         "hasHeaders": true,
-        "requestBody": "{\n    \"title\": \"{title}\",\n    \"header\": {\n        \"text\": \"{header}\",\n        \"alignment\": \"{headerAlignment}\"\n    },\n    \"footer\": {\n        \"text\": \"{footer}\",\n        \"alignment\": \"{footerAlignment}\"\n    },\n    \"sections\": {sections},\n    \"wordConfig\": {\n       \"fontSize\": {fontSize},\n       \"lineHeight\": {lineHeight},\n       \"fontFamily\": \"{fontFamily}\",\n       \"showPageNumber\": {showPageNumber},\n       \"showTableOfContent\": {showTableOfContent},\n       \"showNumberingInHeader\": {showNumberingInHeader},\n       \"numberingReference\": \"{numberingReference}\",\n       \"pageOrientation\": \"{pageOrientation}\",\n       \"margins\": \"{margins}\"\n   }\n}",
+        "requestBody": "{\n     \"slides\": {slides},\n     \"slideConfig\": {\n        \"layout\": \"{layout}\",\n        \"titleFontSize\": {titleFontSize},\n        \"headerFontSize\": {headerFontSize},\n        \"bodyFontSize\": {bodyFontSize},\n        \"fontFamily\": \"{fontFamily}\",\n        \"backgroundColor\": \"{backgroundColor}\",\n        \"textColor\": \"{textColor}\",\n        \"showFooter\": {showFooter},\n        \"showSlideNumber\": {showSlideNumber},\n        \"footerBackgroundColor\": \"{footerBackgroundColor}\",\n        \"footerText\": \"{footerText}\",\n        \"footerTextColor\": \"{footerTextColor}\",\n        \"footerFontSize\": {footerFontSize},\n        \"showTableBorder\": {showTableBorder},\n        \"tableHeaderBackgroundColor\": \"{tableHeaderBackgroundColor}\",\n        \"tableHeaderTextColor\": \"{tableHeaderTextColor}\",\n        \"tableBorderThickness\": {tableBorderThickness},\n        \"tableBorderColor\": \"{tableBorderColor}\",\n        \"tableFontSize\": {tableFontSize},\n        \"tableTextColor\": \"{tableTextColor}\"\n    }\n}",
         "requestHeaders": "{\n      \"Content-Type\": \"application/json\"\n}",
         "resultTransform": {
             "engine": "jmes",
@@ -22,131 +24,105 @@
         "hasResultTransform": false
     },
     "openaiSpec": {
-        "name": "generate_word_file",
+        "name": "generate_powerpoint_slides",
         "parameters": {
             "type": "object",
             "required": [
-                "sections",
-                "title",
-                "header",
-                "footer",
-                "showNumberingInHeader",
-                "showPageNumber",
-                "showTableOfContent"
+                "slides"
             ],
             "properties": {
-                "title": {
-                    "type": "string",
-                    "description": "The title of the document."
-                },
-                "footer": {
-                    "type": "string",
-                    "description": "The text to display in the footer of each page. If user did not mention it, return as empty string."
-                },
-                "header": {
-                    "type": "string",
-                    "description": "The text to display in the header of each page, which is not related to the main title. If user did not mention it, return as empty string."
-                },
-                "sections": {
+                "slides": {
                     "type": "array",
                     "items": {
                         "type": "object",
                         "required": [
-                            "content"
+                            "type",
+                            "title"
                         ],
                         "properties": {
+                            "type": {
+                                "enum": [
+                                    "title_slide",
+                                    "content_slide",
+                                    "table_slide",
+                                    "chart_slide"
+                                ],
+                                "type": "string",
+                                "description": "The type of slide, either 'title_slide' (title-only), 'content_slide' (title and content), 'table_slide' (title with tabular content), or 'chart_slide' (title with chart content)."
+                            },
+                            "title": {
+                                "type": "string",
+                                "description": "The title of the slide."
+                            },
                             "content": {
                                 "type": "array",
                                 "items": {
-                                    "type": "object",
-                                    "properties": {
-                                        "rows": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "object",
-                                                "properties": {
-                                                    "cells": {
-                                                        "type": "array",
-                                                        "items": {
-                                                            "type": "object",
-                                                            "properties": {
-                                                                "text": {
-                                                                    "type": "string",
-                                                                    "description": "Text content for the table cell."
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            },
-                                            "description": "Rows of table content, where each row contains an array of cells."
-                                        },
-                                        "text": {
-                                            "type": "string",
-                                            "description": "The text for paragraphs or list items."
-                                        },
-                                        "type": {
-                                            "enum": [
-                                                "paragraph",
-                                                "listing",
-                                                "table",
-                                                "pageBreak",
-                                                "emptyLine"
-                                            ],
-                                            "type": "string",
-                                            "description": "Specifies the type of content. It must belongs to a child of a content array within a section or a subsection. If the content type is 'pageBreak', the section or subsection will not include a heading."
-                                        },
-                                        "items": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string"
-                                            },
-                                            "description": "A list of items for listing content."
-                                        },
-                                        "headers": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "string"
-                                            },
-                                            "description": "Headers for table content."
-                                        }
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
                                     },
-                                    "description": "Each content in a section can be in different types such as paragraph, listing, table, pageBreak or emptyLine"
-                                }
-                            },
-                            "heading": {
-                                "type": "string",
-                                "description": "The heading of the section."
-                            },
-                            "subSections": {
-                                "type": "array",
-                                "items": {
-                                    "$ref": "#/parameters/properties/sections/items"
+                                    "description": "A row in the table for 'table_slide'. Each row is an array of strings."
                                 },
-                                "description": "Nested sub-sections within this section."
+                                "description": "The content of the slide. For 'title_slide', this is not required. For 'content_slide', it can be a string (paragraph) or an array of strings (list). For 'table_slide', it is an array of rows, where each row is an array of strings."
                             },
-                            "headingLevel": {
-                                "type": "integer",
-                                "description": "The level of the heading (e.g., 1 for top-level, 2 for sub-section)."
+                            "subtitle": {
+                                "type": "string",
+                                "description": "The subtitle of the slide, which provides additional information to support the title. Only title_slide has the subtitle."
+                            },
+                            "chartContent": {
+                                "type": "object",
+                                "required": [
+                                    "type",
+                                    "data"
+                                ],
+                                "properties": {
+                                    "data": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "name": {
+                                                    "type": "string",
+                                                    "description": "The name of the chart series."
+                                                },
+                                                "labels": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string"
+                                                    },
+                                                    "description": "The labels for the chart (e.g., categories, time periods)."
+                                                },
+                                                "values": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "number"
+                                                    },
+                                                    "description": "The values for each label in the chart."
+                                                }
+                                            }
+                                        },
+                                        "description": "The chart data. Depending on the type, this can be an array of labels and values."
+                                    },
+                                    "type": {
+                                        "enum": [
+                                            "pie",
+                                            "bar",
+                                            "line",
+                                            "doughnut"
+                                        ],
+                                        "type": "string",
+                                        "description": "The type of chart, either 'pie', 'doughnut', 'bar', or 'line'."
+                                    }
+                                },
+                                "description": "The chart data for 'chart_slide'. This includes various types of chart data such as pie charts, doughnut charts, bar charts, and line charts."
                             }
                         }
-                    }
-                },
-                "showPageNumber": {
-                    "type": "boolean",
-                    "description": "This field controls whether the page number is displayed in the footer of the Word document. By default, the page number is hidden (false). Always keep it set to (false), even when the user requests otherwise. Set this field to 'true' to display the page number in the footer. Please note that this setting is applied when the document is generated and will affect the output accordingly."
-                },
-                "showTableOfContent": {
-                    "type": "boolean",
-                    "description": "This field controls whether a table of contents is included in the Word document. By default, the table of contents is not included (false). Always keep it set to (false), even when the user requests otherwise. Set this field to 'true' if you would like to include a table of contents. Please note that this setting is applied when the document is generated and will affect the output accordingly."
-                },
-                "showNumberingInHeader": {
-                    "type": "boolean",
-                    "description": "This field controls whether predefined numbering hierarchy formats are shown in the header of the Word document. By default, the numbering is hidden (false). Always keep it set to (false), even when the user requests otherwise. Set this field to 'true' if you would like to show numbering in the header. Please note that this setting is applied when the document is generated and will affect the output accordingly."
+                    },
+                    "description": "A list of slides, where each slide includes its type, title, and content."
                 }
             }
         },
-        "description": "Generate a Word document based on the given sections, title, header, and footer, and return the URL for downloading it."
+        "description": "Generate a PowerPoint file and return the URL for downloading it."
     },
     "outputType": "respond_to_ai",
     "oauthConfig": null,
@@ -159,108 +135,187 @@
             "placeholder": "https://...."
         },
         {
-            "name": "pageOrientation",
+            "name": "layout",
             "type": "enum",
-            "label": "Page Orientation",
+            "label": "Slide Layout",
             "values": [
-                "portrait",
-                "landscape"
+                "LAYOUT_WIDE",
+                "LAYOUT_16x9",
+                "LAYOUT_16x10",
+                "LAYOUT_4x3"
             ],
-            "default": "portrait",
-            "description": "Set page orientation for all pages."
+            "description": "Default: LAYOUT_WIDE. Options: LAYOUT_16x9, LAYOUT_16x10, LAYOUT_4x3."
         },
         {
-            "name": "fontSize",
+            "name": "titleFontSize",
             "type": "number",
-            "label": "Font Size",
-            "description": "Font size for the slides, default is 12 pt.",
-            "placeholder": "12"
+            "label": "Title Font Size",
+            "description": "Font size for the title slide to emphasize the main topic, default is 52 pt.",
+            "placeholder": "52"
+        },
+        {
+            "name": "headerFontSize",
+            "type": "number",
+            "label": "Header Font Size",
+            "description": "Font size for headers in content slides, default is 32 pt.",
+            "placeholder": "32"
+        },
+        {
+            "name": "bodyFontSize",
+            "type": "number",
+            "label": "Body Font Size",
+            "description": "Font size for main content text, default is 24 pt.",
+            "placeholder": "24"
         },
         {
             "name": "fontFamily",
             "type": "enum",
             "label": "Font Family",
             "values": [
-                "Arial",
                 "Calibri",
-                "Times New Roman",
+                "Arial",
                 "Courier New",
-                "Verdana",
-                "Tahoma",
                 "Georgia",
-                "Comic Sans MS"
+                "Helvetica",
+                "Impact",
+                "Lucida Console",
+                "Tahoma",
+                "Times New Roman",
+                "Trebuchet MS",
+                "Verdana",
+                "Comic Sans MS",
+                "Franklin Gothic Medium",
+                "Century Gothic",
+                "Gill Sans",
+                "Garamond",
+                "Palatino Linotype",
+                "Segoe UI",
+                "Book Antiqua",
+                "Symbol",
+                "Monospace",
+                "Webdings",
+                "Wingdings"
             ],
-            "default": "Arial",
-            "description": "Font family for the slides, default is Arial."
+            "description": "Default font family for the slide. default is Calibri",
+            "placeholder": "Calibri"
         },
         {
-            "name": "lineHeight",
-            "type": "enum",
-            "label": "Line Height",
-            "values": [
-                "1",
-                "1.15",
-                "1.25",
-                "1.5",
-                "2"
-            ],
-            "default": "1",
-            "description": "Set line height for text content."
+            "name": "backgroundColor",
+            "type": "text",
+            "label": "Background Color",
+            "description": "Slide background color in hex format, default is #FFFFFF.",
+            "placeholder": "#FFFFFF"
         },
         {
-            "name": "margins",
-            "type": "enum",
-            "label": "Page Margins",
-            "values": [
-                "normal",
-                "narrow",
-                "moderate",
-                "wide",
-                "mirrored"
-            ],
-            "default": "normal",
-            "description": "Set margins for the slides. Default margin is normal"
+            "name": "textColor",
+            "type": "text",
+            "label": "Text Color",
+            "description": "Text color in hex format, default is #000000.",
+            "placeholder": "#000000"
         },
         {
-            "name": "headerAlignment",
+            "name": "showFooter",
             "type": "enum",
-            "label": "Header Alignment",
+            "label": "Show Footer",
             "values": [
-                "left",
-                "center",
-                "right"
+                "false",
+                "true"
             ],
-            "default": "left",
-            "description": "Indicate the position of text in header. Default is left"
+            "description": "Toggle to display the footer, default is false."
         },
         {
-            "name": "footerAlignment",
+            "name": "showSlideNumber",
             "type": "enum",
-            "label": "Footer Alignment",
+            "label": "Show Slide Number",
             "values": [
-                "left",
-                "center",
-                "right"
+                "false",
+                "true"
             ],
-            "default": "left",
-            "description": "Indicate the position of text in footer. Default is left"
+            "description": "Toggle to display slide numbers, default is false."
         },
         {
-            "name": "numberingReference",
+            "name": "footerBackgroundColor",
+            "type": "text",
+            "label": "Footer Background Color",
+            "description": "Footer background color in hex format, default is #003B75.",
+            "placeholder": "#003B75 - Dark Blue"
+        },
+        {
+            "name": "footerText",
+            "type": "text",
+            "label": "Footer Text",
+            "description": "Footer text content, default is 'footer text'.",
+            "placeholder": "Ex. TypingMind Custom"
+        },
+        {
+            "name": "footerTextColor",
+            "type": "text",
+            "label": "Footer Text Color",
+            "description": "Footer text color in hex format, default is #FFFFFF.",
+            "placeholder": "#FFFFFF"
+        },
+        {
+            "name": "footerFontSize",
+            "type": "number",
+            "label": "Footer Font Size",
+            "description": "Font size for footer text, default is 10 pt.",
+            "placeholder": "10"
+        },
+        {
+            "name": "showTableBorder",
             "type": "enum",
-            "label": "Document Numbering Formats",
+            "label": "Show Table Border",
             "values": [
-                "1.1.1.1 (Decimal)",
-                "I.1.a.i (Roman -> Decimal > Lower Letter -> Lower Roman)",
-                "I.A.1.a (Roman -> Upper Letter -> Decimal -> Lower Letter)",
-                "1)a)i)(i) (Decimal -> Lower Letter -> Lower Roman -> Lower Roman with Parentheses)",
-                "A.1.a.i (Upper Letter -> Decimal -> Lower Letter -> Lower Roman)"
+                "true",
+                "false"
             ],
-            "default": "1.1.1.1 (Decimal)",
-            "description": "Set numbering hierarchy format. Default is 1.1.1.1 (Decimal)."
+            "description": "Toggle to display table borders, default is true."
+        },
+        {
+            "name": "tableHeaderBackgroundColor",
+            "type": "text",
+            "label": "Table Header Background Color",
+            "description": "Background color for table headers in hex format, default is #003B75.",
+            "placeholder": "#003B75 - Dark Blue"
+        },
+        {
+            "name": "tableHeaderTextColor",
+            "type": "text",
+            "label": "Table Header Text Color",
+            "description": "Text color for table headers in hex format, default is #FFFFFF.",
+            "placeholder": "#FFFFFF"
+        },
+        {
+            "name": "tableBorderThickness",
+            "type": "number",
+            "label": "Table Border Thickness",
+            "description": "Thickness of table borders in points, default is 1 pt.",
+            "placeholder": "1 pt"
+        },
+        {
+            "name": "tableBorderColor",
+            "type": "text",
+            "label": "Table Border Color",
+            "description": "Table border color in hex format, default is #000000.",
+            "placeholder": "#000000"
+        },
+        {
+            "name": "tableFontSize",
+            "type": "number",
+            "label": "Table Font Size",
+            "description": "Font size for text inside tables, default is 14 pt.",
+            "placeholder": "14 pt"
+        },
+        {
+            "name": "tableTextColor",
+            "type": "text",
+            "label": "Table Text Color",
+            "description": "Text color for table content in hex format, default is #000000.",
+            "placeholder": "#000000"
         }
     ],
-    "overviewMarkdown": "# Plugin Word Generator\n\nThis plugin enables users to generate Docx file quickly and efficiently.\n\n👉 **It supports**:  \n- Multiple sections with hierarchical numbering format.\n- Adding header, footer, and page number.\n- Adding table.\n- Adding list with bullet points.\n- Adding table of content.\n- Adding page break.\n- Ability to **customize basic document attributes**  \n  - Flexible page margins with presets like Normal, Narrow, and Wide.  \n  - Customizable line heights (Single, 1.15, 1.25, 1.5, Double). \n  - Customizable font size.\n  - Customizable font family.\n  - Page orientation (Portrait, Landscape).\n\n👉 **Note:** \n- A plugin server must be set up to use this feature. Follow the detailed guide to set up a plugin server on Render: [How to Deploy Plugins Server on Render](https://docs.typingmind.com/plugins/plugins-server/how-to-deploy-plugins-server-on-render)\n- The generated Word files will be automatically removed after one hour.\n- The plugin currently does not support embedding images in Word documents.",
+    "isServerPlugin": false,
+    "overviewMarkdown": "# PowerPoint Generator\n\nThis plugin enables users to generate PowerPoint slides quickly and efficiently.\n\n👉 **It supports**:  \n- Multiple **slide layouts** to fit different presentation needs.\n- **Tables** and various **charts** (pie, bar, line, doughnut).\n- Options to **show/hide footers** with customizable attributes.\n- Ability to **customize basic slide attributes**, including font family, font size, background color, etc.\n\n👉 **Note:** \n- A plugin server must be set up to use this feature. Follow the detailed guide to set up a plugin server on Render: [How to Deploy Plugins Server on Render](https://docs.typingmind.com/plugins/plugins-server/how-to-deploy-plugins-server-on-render)\n- The generated PowerPoint files will be automatically removed after one hour.\n- The plugin does not yet support image embedding in PowerPoint files.",
     "turnedOnByDefault": false,
     "authenticationType": "AUTH_TYPE_NONE",
     "implementationType": "http"
