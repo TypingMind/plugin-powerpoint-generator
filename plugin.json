@@ -1,11 +1,10 @@
 {
     "id": "generate_powerpoint_slides",
-    "code": "# Your JS code here",
     "uuid": "9626f3af-5ef7-4234-aadf-fba896bf3177",
     "emoji": "🧩",
     "title": "PowerPoint Generator",
     "system": false,
-    "iconURL": "https://cdn-dynmedia-1.microsoft.com/is/image/microsoftcorp/Icon_PowerPoint_36x36_2x?fmt=png-alpha",
+    "iconURL": "https://custom.typingmind.com/assets/plugins/powerpoint.webp",
     "disabled": false,
     "syncedAt": null,
     "httpAction": {
@@ -122,7 +121,7 @@
                 }
             }
         },
-        "description": "Generate a PowerPoint file and return the URL for downloading it."
+        "description": "Generate a PowerPoint file and return the URL for downloading it. If the download url is not present in the response, inform the user that the PowerPoint file could not be generated. Prompt the user to verify that the correct plugin server URL is being used."
     },
     "outputType": "respond_to_ai",
     "oauthConfig": null,
